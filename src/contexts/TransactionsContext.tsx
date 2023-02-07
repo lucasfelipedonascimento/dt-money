@@ -13,6 +13,7 @@ interface Transaction {
 // criamos a tipagem do contexto. Ele vai receber uma lista de transactions
 interface TransactionContextType {
   transactions: Transaction[];
+  fetchTransactions: (query?: string) => Promise<void>;
 }
 
 // colocamos o children dentro do nosso provider, para ele receber o elemento filho
@@ -29,9 +30,15 @@ export function TransactionsProvider({children}: TransactionsProviderProps) {
   // que recebe inicialmente uma lista vazia
   const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  async function loadTransactions() {
+  async function fetchTransactions(query?: string) {
+    const url = new URL('http://localhost:3333/transactions');
+
+    if (query) {
+      url.searchParams.append('q', query);
+    }
+
     // batemos na api para pegar nossos dados
-    const response = await fetch('http://localhost:3333/transactions')
+    const response = await fetch(url)
     // pegamos os dados vindo da api e convertemos para json
     const data = await response.json();
 
@@ -63,7 +70,7 @@ export function TransactionsProvider({children}: TransactionsProviderProps) {
   // usamos o useEffect para fazer a renderização 
   // da nossa lista de transações
   useEffect(() => {
-    loadTransactions();
+    fetchTransactions();
   }, []) 
   // deixando o array de dependências vazio,
   // o sistema só será renderizado se alguma transação nova for criada
@@ -73,7 +80,7 @@ export function TransactionsProvider({children}: TransactionsProviderProps) {
       {/* Passamos o "valor" do contexto para ser usado em outro componente
         e dentro dele vem o children, que será para renderizar os "filhos" que estão dentro
       */}
-      <TransactionContext.Provider value={{ transactions }}>
+      <TransactionContext.Provider value={{ transactions, fetchTransactions }}>
         {children}
       </TransactionContext.Provider>
     </>
