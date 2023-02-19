@@ -23,6 +23,22 @@
       "category": "Venda",
       "price": 60,
       "createdAt": "2023-01-25T18:35:39.368Z"
+    },
+    {
+      "description": "Desenvolvimento de aplicativo",
+      "price": 15000,
+      "category": "Venda",
+      "type": "income",
+      "createdAt": "2023-02-19T16:29:16.684Z",
+      "id": 4
+    },
+    {
+      "description": "Feira",
+      "price": 350,
+      "category": "Utilidades",
+      "type": "outcome",
+      "createdAt": "2023-02-19T16:55:21.989Z",
+      "id": 5
     }
   ]
 }
