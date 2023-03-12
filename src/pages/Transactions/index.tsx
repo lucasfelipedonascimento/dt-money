@@ -1,20 +1,23 @@
-import { useContext } from 'react'
-import { Header } from '../../components/Header'
-import { Summary } from '../../components/Summary'
-import { TransactionContext } from '../../contexts/TransactionsContext'
-import { dateFormatter, priceFormatter } from '../../utils/formatter'
-import { SearchForm } from './components/SearchForm'
+/* eslint-disable prettier/prettier */
+import { useContextSelector } from "use-context-selector";
+import { Header } from "../../components/Header";
+import { Summary } from "../../components/Summary";
+import { TransactionContext } from "../../contexts/TransactionsContext";
+import { dateFormatter, priceFormatter } from "../../utils/formatter";
+import { SearchForm } from "./components/SearchForm";
 import {
   PriceHighlight,
   TransactionsContainer,
   TransactionsTable,
-} from './styles'
+} from "./styles";
 
 // criamos a tipagem dos dados das nossas transações
 
 export function Transactions() {
   // exportando o contexto de transactions
-  const { transactions } = useContext(TransactionContext)
+  const transactions = useContextSelector(TransactionContext, (context) => {
+    return context.transactions;
+  });
 
   return (
     <div>
@@ -33,7 +36,7 @@ export function Transactions() {
                     <td width="50%">{transaction.description}</td>
                     <td>
                       <PriceHighlight variant={transaction.type}>
-                        {transaction.type === 'outcome' && '- '}
+                        {transaction.type === "outcome" && "- "}
                         {priceFormatter.format(transaction.price)}
                       </PriceHighlight>
                     </td>
@@ -42,11 +45,11 @@ export function Transactions() {
                       {dateFormatter.format(new Date(transaction.createdAt))}
                     </td>
                   </tr>
-                )
+                );
               })}
           </tbody>
         </TransactionsTable>
       </TransactionsContainer>
     </div>
-  )
+  );
 }

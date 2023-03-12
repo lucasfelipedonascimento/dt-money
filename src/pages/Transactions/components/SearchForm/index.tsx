@@ -1,20 +1,27 @@
-import { SearchFormContainer } from './styles'
-import { MagnifyingGlass } from 'phosphor-react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { TransactionContext } from '../../../../contexts/TransactionsContext'
-import { useContext } from 'react'
+/* eslint-disable prettier/prettier */
+import { SearchFormContainer } from "./styles";
+import { MagnifyingGlass } from "phosphor-react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { TransactionContext } from "../../../../contexts/TransactionsContext";
+import { useContextSelector } from "use-context-selector";
+import { memo } from "react";
 
 const searchFormSchema = z.object({
   query: z.string(),
-})
+});
 
 // tipagem do formulário
-type SearchFormInputs = z.infer<typeof searchFormSchema>
+type SearchFormInputs = z.infer<typeof searchFormSchema>;
 
-export function SearchForm() {
-  const { fetchTransactions } = useContext(TransactionContext)
+function SearchFormComponent() {
+  const fetchTransactions = useContextSelector(
+    TransactionContext,
+    (context) => {
+      return context.fetchTransactions;
+    }
+  );
 
   const {
     register,
@@ -22,12 +29,12 @@ export function SearchForm() {
     formState: { isSubmitting },
   } = useForm<SearchFormInputs>({
     resolver: zodResolver(searchFormSchema),
-  })
+  });
 
   async function handleSearchTransactions(data: SearchFormInputs) {
-    await fetchTransactions(data.query)
+    await fetchTransactions(data.query);
 
-    console.log(data)
+    console.log(data);
   }
 
   return (
@@ -35,7 +42,7 @@ export function SearchForm() {
       <input
         type="text"
         placeholder="Busque por transações"
-        {...register('query')}
+        {...register("query")}
       />
 
       <button type="submit" disabled={isSubmitting}>
@@ -43,5 +50,7 @@ export function SearchForm() {
         Buscar
       </button>
     </SearchFormContainer>
-  )
+  );
 }
+
+export const SearchForm = memo(SearchFormComponent);

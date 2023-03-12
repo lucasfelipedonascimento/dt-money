@@ -1,45 +1,48 @@
-import { createContext, ReactNode, useEffect, useState } from 'react'
-import { api } from '../lib/axios'
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable prettier/prettier */
+import { ReactNode, useEffect, useState, useCallback } from "react";
+import { createContext } from "use-context-selector";
+import { api } from "../lib/axios";
 
 // tipamos os dados da lista de transações
 interface Transaction {
-  id: number
-  description: string
-  type: 'income' | 'outcome'
-  price: number
-  category: string
-  createdAt: string
+  id: number;
+  description: string;
+  type: "income" | "outcome";
+  price: number;
+  category: string;
+  createdAt: string;
 }
 
 interface CreateTransactionInput {
-  description: string
-  price: number
-  category: string
-  type: 'income' | 'outcome'
+  description: string;
+  price: number;
+  category: string;
+  type: "income" | "outcome";
 }
 
 // criamos a tipagem do contexto. Ele vai receber uma lista de transactions
 interface TransactionContextType {
-  transactions: Transaction[]
-  fetchTransactions: (query?: string) => Promise<void>
-  createTransaction: (data: CreateTransactionInput) => Promise<void>
+  transactions: Transaction[];
+  fetchTransactions: (query?: string) => Promise<void>;
+  createTransaction: (data: CreateTransactionInput) => Promise<void>;
 }
 
 // colocamos o children dentro do nosso provider, para ele receber o elemento filho
 interface TransactionsProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 // exportamos nosso contexto para ele ser usado em outros componentes
 // dizemos que ele é um objeto baseado na tipagem do contexto
-export const TransactionContext = createContext({} as TransactionContextType)
+export const TransactionContext = createContext({} as TransactionContextType);
 
 export function TransactionsProvider({ children }: TransactionsProviderProps) {
   // criamos um estado do tipo "Lista de Transições"
   // que recebe inicialmente uma lista vazia
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  async function fetchTransactions(query?: string) {
+  const fetchTransactions = useCallback(async (query?: string) => {
     // const url = new URL('/transactions');
 
     // if (query) {
@@ -71,38 +74,41 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
        })
     */
 
-    const response = await api.get('/transactions', {
+    const response = await api.get("/transactions", {
       params: {
-        _sort: 'createdAt',
-        _order: 'desc',
+        _sort: "createdAt",
+        _order: "desc",
         q: query,
       },
-    })
+    });
 
     // passamos os dados vindo da api para a nossa lista de transações
-    setTransactions(response.data)
-  }
+    setTransactions(response.data);
+  }, []);
 
-  async function createTransaction(data: CreateTransactionInput) {
-    const { description, price, category, type } = data
+  const createTransaction = useCallback(
+    async (data: CreateTransactionInput) => {
+      const { description, price, category, type } = data;
 
-    const response = await api.post('/transactions', {
-      description,
-      price,
-      category,
-      type,
-      createdAt: new Date(),
-    })
+      const response = await api.post("/transactions", {
+        description,
+        price,
+        category,
+        type,
+        createdAt: new Date(),
+      });
 
-    setTransactions((state) => [response.data, ...state])
-  }
+      setTransactions((state) => [response.data, ...state]);
+    },
+    []
+  );
 
   // No useEffect não podemos usar o async & await diretamente
   // usamos o useEffect para fazer a renderização
   // da nossa lista de transações
   useEffect(() => {
-    fetchTransactions()
-  }, [])
+    fetchTransactions();
+  }, []);
   // deixando o array de dependências vazio,
   // o sistema só será renderizado se alguma transação nova for criada
 
@@ -117,5 +123,5 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
         {children}
       </TransactionContext.Provider>
     </>
-  )
+  );
 }
